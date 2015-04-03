@@ -12,7 +12,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WebApiOAuthDemo</RootNamespace>
-    <AssemblyName>WebApiDemo</AssemblyName>
+    <AssemblyName>WebApiOAuthDemo</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
@@ -315,7 +315,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>29335</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:30888/WebApiDemo</IISUrl>
+          <IISUrl>http://localhost:30888/WebApiOAuthDemo</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
           <IISAppRootUrl>http://localhost:30888/WebApiDemo</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
