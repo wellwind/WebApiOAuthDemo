@@ -1,0 +1,13 @@
+﻿@using WebApiOAuthDemo.Models.ViewModels;
+@model List<FacebookPhoto>
+@{
+    ViewBag.Title = "My Facebook Photos";
+}
+
+<p>@Html.ActionLink("Cancel Auth", "CancelAuth")</p>
+
+<h2>@ViewBag.Title</h2>
+
+@foreach(FacebookPhoto photo in Model) {
+    <div><a href="@photo.Link" target="_blank"><img src="@photo.Picture" /></a>@photo.Name</div>
+}
