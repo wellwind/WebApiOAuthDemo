@@ -81,7 +81,7 @@ namespace WebApiOAuthDemo.Controllers
                 });
             }
 
-            return View("../Facebook/Holdays", calendarEvents.OrderBy(x => x.StartDate));
+            return View("../Google/Holdays", calendarEvents.OrderBy(x => x.StartDate));
         }
     }
 }

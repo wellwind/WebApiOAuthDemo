@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using WebApiOAuthDemo.Core.GoogleApi;
+using WebApiOAuthDemo.Models.ViewModels;
 
 namespace WebApiOAuthDemo.Controllers
 {
@@ -22,8 +23,7 @@ namespace WebApiOAuthDemo.Controllers
 
         public async Task<ActionResult> IndexAsync(CancellationToken cancellationToken)
         {
-            var result = await new AuthorizationCodeMvcApp(this, new AppFlowMetadata()).
-                AuthorizeAsync(cancellationToken);
+            var result = await new AuthorizationCodeMvcApp(this, new AppFlowMetadata()).AuthorizeAsync(cancellationToken);
 
             if (result.Credential != null)
             {
@@ -34,19 +34,20 @@ namespace WebApiOAuthDemo.Controllers
                     HttpClientInitializer = result.Credential,
                     ApplicationName = "MyApiTest"
                 });
-                var holidayCalendar = service.Calendars.Get("zh_tw.taiwan#holiday@group.v.calendar.google.com");
 
-                //var service = new DriveService(new BaseClientService.Initializer
-                //{
-                //    HttpClientInitializer = result.Credential,
-                //    ApplicationName = "ASP.NET MVC Sample"
-                //});
-
-                //// YOUR CODE SHOULD BE HERE..
-                //// SAMPLE CODE:
-                //var list = await service.Files.List().ExecuteAsync();
-                //ViewBag.Message = "FILE COUNT IS: " + list.Items.Count();
-                return View();
+                var events = service.Events.List("zh_tw.taiwan#holiday@group.v.calendar.google.com").Execute();
+                List<GoogleCalendar> holidays = new List<GoogleCalendar>();
+                foreach (var holiday in events.Items)
+                {
+                    holidays.Add(new GoogleCalendar()
+                    {
+                        Name = holiday.Summary,
+                        Link = holiday.HtmlLink,
+                        StartDate = Convert.ToDateTime(holiday.Start.Date),
+                        EndDate = Convert.ToDateTime(holiday.End.Date)
+                    });
+                }
+                return View("../Google/Holdays", holidays.OrderBy(x => x.StartDate));
             }
             else
             {
@@ -66,7 +67,7 @@ namespace WebApiOAuthDemo.Controllers
 
         public ActionResult Hoildays()
         {
-            return View("../Facebook/Holdays");
+            return View("../Google/Holdays");
         }
     }
 }

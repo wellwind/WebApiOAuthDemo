@@ -16,11 +16,5 @@ namespace WebApiOAuthDemo.Controllers
         {
             get { return new AppFlowMetadata(); }
         }
-
-        //public override async Task<ActionResult> IndexAsync(AuthorizationCodeResponseUrl authorizationCode, CancellationToken taskCancellationToken)
-        //{
-        //    base.IndexAsync(authorizationCode, taskCancellationToken);
-        //    return new EmptyResult();
-        //}
     }
 }
