@@ -1,38 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using DotNetOpenAuth.Messaging;
+﻿using DotNetOpenAuth.Messaging;
 using DotNetOpenAuth.OAuth2;
-using WebApiOAuthDemo.Core.Helpers;
-using WebApiOAuthDemo.Models.ViewModels;
-using System.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using WebApiOAuthDemo.Core.ApiSettings;
+using WebApiOAuthDemo.Core.Helpers;
+using WebApiOAuthDemo.Models.ViewModels;
 
 namespace WebApiOAuthDemo.Controllers
 {
-    public class FacebookOpenAuthController : Controller
+    public class FacebookOpenAuthController : FacebookBaseController
     {
-        private string clientId = ConfigHelper.Facebook.AppId;
-        private string clientSecret = ConfigHelper.Facebook.AppSecret;
-
-        private string redirectUrl = ConfigHelper.GetAuthReturnUrl("Facebook", "AuthReturn");
-
         private WebServerClient oauthRequestClient;
-
-        private string fbAccessToken
-        {
-            get
-            {
-                return Session["FbAccessToken"] == null || String.IsNullOrEmpty(Session["FbAccessToken"].ToString()) ? "" : Session["FbAccessToken"].ToString();
-            }
-            set
-            {
-                ;
-            }
-        }
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
@@ -40,12 +24,12 @@ namespace WebApiOAuthDemo.Controllers
 
             AuthorizationServerDescription authorizationServer = new AuthorizationServerDescription
             {
-                AuthorizationEndpoint = new Uri("https://graph.facebook.com/oauth/authorize"),
-                TokenEndpoint = new Uri("https://graph.facebook.com/oauth/access_token")
+                AuthorizationEndpoint = new Uri(apiSettings.AuthorizationEndpoint),
+                TokenEndpoint = new Uri(apiSettings.TokenEndpoint)
             };
             oauthRequestClient = new WebServerClient(authorizationServer);
-            oauthRequestClient.ClientIdentifier = clientId;
-            oauthRequestClient.ClientCredentialApplicator = ClientCredentialApplicator.PostParameter(clientSecret);
+            oauthRequestClient.ClientIdentifier = apiSettings.ClientId;
+            oauthRequestClient.ClientCredentialApplicator = ClientCredentialApplicator.PostParameter(apiSettings.Secret);
         }
 
         public ActionResult Index()
@@ -54,8 +38,9 @@ namespace WebApiOAuthDemo.Controllers
             {
                 // 向Facebook取得code
                 oauthRequestClient.RequestUserAuthorization(
-                    new[] { "user_photos" }, 
-                    new Uri(ConfigHelper.GetAuthReturnUrl("FacebookOpenAuth", "AuthReturn")));
+                    new[] { "user_photos" },
+                    new Uri(redirectUrl));
+
                 return new EmptyResult();
             }
             else
@@ -64,12 +49,12 @@ namespace WebApiOAuthDemo.Controllers
             }
         }
 
-        public ActionResult AuthReturn()
+        public override ActionResult AuthReturn()
         {
             var authorizationState = oauthRequestClient.ProcessUserAuthorization();
             if (authorizationState != null)
             {
-                Session.Add("FbAccessToken", authorizationState.AccessToken);
+                fbAccessToken = authorizationState.AccessToken;
             }
 
             return RedirectToAction("MyPhotos", "Facebook");
