@@ -9,18 +9,26 @@ using WebApiOAuthDemo.Models.ViewModels;
 
 namespace WebApiOAuthDemo.Controllers
 {
+    /// <summary>
+    /// 使用Facebook Sdk存取Facebook Api範例
+    /// 關於Facebook Sdk可以參考: http://facebooksdk.net/
+    /// </summary>
     public class FacebookSdkController : FacebookBaseController
     {
+        /// <summary>
+        /// FacebookSdk提供的FacebookClient物件
+        /// </summary>
         private FacebookClient fbClient = new FacebookClient();
 
         public ActionResult Index()
         {
-            if (String.IsNullOrEmpty(fbAccessToken))
+            if (String.IsNullOrEmpty(FbAccessToken))
             {
-                fbClient.AppId = apiSettings.ClientId;
-                fbClient.AppSecret = apiSettings.Secret;
+                // 利用FacebookClient物件取得Authorization Server位址
+                fbClient.AppId = ApiSettings.ClientId;
+                fbClient.AppSecret = ApiSettings.Secret;
 
-                Uri fbOAuthLoginUrl = fbClient.GetLoginUrl(new { redirect_uri = redirectUrl, scope = "user_photos" });
+                Uri fbOAuthLoginUrl = fbClient.GetLoginUrl(new { redirect_uri = RedirectUrl, scope = "user_photos" });
                 return Redirect(fbOAuthLoginUrl.ToString());
             }
             return RedirectToAction("MyPhotos");
@@ -28,22 +36,23 @@ namespace WebApiOAuthDemo.Controllers
 
         public override ActionResult AuthReturn()
         {
+            // 利用FacebookClient物件將code給Token Server換取Access Token
             dynamic result = fbClient.Get("oauth/access_token", new
             {
-                client_id = apiSettings.ClientId,
-                client_secret = apiSettings.Secret,
+                client_id = ApiSettings.ClientId,
+                client_secret = ApiSettings.Secret,
                 code = Request.QueryString["code"],
-                redirect_uri = redirectUrl
+                redirect_uri = RedirectUrl
             });
 
-            fbAccessToken = result.access_token;
+            FbAccessToken = result.access_token;
 
             return RedirectToAction("MyPhotos");
         }
 
         public override ActionResult CancelAuth()
         {
-            FacebookClient client = new FacebookClient(fbAccessToken);
+            FacebookClient client = new FacebookClient(FbAccessToken);
             client.Delete("me/permissions");
 
             return RedirectToAction("Index", "Home");
@@ -51,7 +60,9 @@ namespace WebApiOAuthDemo.Controllers
 
         public ActionResult MyPhotos()
         {
-            FacebookClient client = new FacebookClient(fbAccessToken);
+            // 利用FacebookClient(帶入AccessToken參數)來存取Api範例
+            // Facebook Sdk有自己的Json物件, 但其實不是很好用
+            FacebookClient client = new FacebookClient(FbAccessToken);
             JsonObject myPhotos = client.Get("me?fields=photos") as JsonObject;
 
             List<FacebookPhoto> photos = new List<FacebookPhoto>();

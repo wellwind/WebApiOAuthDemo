@@ -5,6 +5,9 @@ using System.Web;
 
 namespace WebApiOAuthDemo.Core.ApiSettings
 {
+    /// <summary>
+    /// 以OAuth存取Facebook Api的Client相關設定
+    /// </summary>
     public class FacebookApi : ApiSettings
     {
         public string ClientId { get { return "1612267449003491"; } set { ;} }

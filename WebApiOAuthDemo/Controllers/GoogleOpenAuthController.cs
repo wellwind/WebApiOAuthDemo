@@ -14,31 +14,39 @@ using WebApiOAuthDemo.Models.ViewModels;
 
 namespace WebApiOAuthDemo.Controllers
 {
+    /// <summary>
+    /// 使用DotNetOpenAuth元件進行OAuth驗證的參考範例
+    /// </summary>
     public class GoogleOpenAuthController : GoogleBaseController
     {
+        /// <summary>
+        /// DotNetOpenAuth提供的Client物件
+        /// </summary>
         private WebServerClient oauthRequestClient;
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             base.OnActionExecuting(filterContext);
 
+            // // 設定Authorization Server資訊
             AuthorizationServerDescription authorizationServer = new AuthorizationServerDescription
             {
-                AuthorizationEndpoint = new Uri(apiSettings.AuthorizationEndpoint),
-                TokenEndpoint = new Uri(apiSettings.TokenEndpoint)
+                AuthorizationEndpoint = new Uri(ApiSettings.AuthorizationEndpoint),
+                TokenEndpoint = new Uri(ApiSettings.TokenEndpoint)
             };
             oauthRequestClient = new WebServerClient(authorizationServer);
-            oauthRequestClient.ClientIdentifier = apiSettings.ClientId;
-            oauthRequestClient.ClientCredentialApplicator = ClientCredentialApplicator.PostParameter(apiSettings.Secret);
+            oauthRequestClient.ClientIdentifier = ApiSettings.ClientId;
+            oauthRequestClient.ClientCredentialApplicator = ClientCredentialApplicator.PostParameter(ApiSettings.Secret);
         }
 
         public ActionResult Index()
         {
-            if (String.IsNullOrEmpty(googleAccessToken))
+            if (String.IsNullOrEmpty(GoogleAccessToken))
             {
+                // 向Google Authorizatoin Server取得code
                 oauthRequestClient.RequestUserAuthorization(
                     new[] { "https://www.googleapis.com/auth/calendar" },
-                    new Uri(redirectUrl));
+                    new Uri(RedirectUrl));
                 return new EmptyResult();
             }
             else
@@ -49,10 +57,11 @@ namespace WebApiOAuthDemo.Controllers
 
         public override ActionResult AuthReturn()
         {
+            // 回傳code後, 再向Authorization Server驗證取得Access Token
             var authorizationState = oauthRequestClient.ProcessUserAuthorization();
             if (authorizationState != null)
             {
-                googleAccessToken = authorizationState.AccessToken;
+                GoogleAccessToken = authorizationState.AccessToken;
             }
 
             return RedirectToAction("Holdays");
@@ -63,10 +72,12 @@ namespace WebApiOAuthDemo.Controllers
             // 台灣假日行事曆ID
             string calendarId = "zh_tw.taiwan#holiday@group.v.calendar.google.com";
 
+            // Facebook Api的相關說明可以參考 https://developers.facebook.com/docs/graph-api/reference/
+
             WebClient client = new WebClient();
             client.Encoding = System.Text.Encoding.UTF8;
             string calendatEventsListApiUrl = @"https://www.googleapis.com/calendar/v3/calendars/{0}/events?key={1}&access_token={2}";
-            string calendarEventsJsonString = client.DownloadString(String.Format(calendatEventsListApiUrl, HttpUtility.UrlEncode(calendarId), apiSettings.ClientId, googleAccessToken));
+            string calendarEventsJsonString = client.DownloadString(String.Format(calendatEventsListApiUrl, HttpUtility.UrlEncode(calendarId), ApiSettings.ClientId, GoogleAccessToken));
             JObject jsonCalendarEvents = (JsonConvert.DeserializeObject(calendarEventsJsonString) as JObject);
 
             List<GoogleCalendar> calendarEvents = new List<GoogleCalendar>();

@@ -9,13 +9,16 @@ using WebApiOAuthDemo.Core.Helpers;
 
 namespace WebApiOAuthDemo.Controllers
 {
+    /// <summary>
+    /// 使用Facebook Api的基本設定存成FacebookBaseController
+    /// </summary>
     public abstract class FacebookBaseController : Controller
     {
-        protected string redirectUrl { get; set; }
+        protected string RedirectUrl { get; set; }
 
-        protected ApiSettings apiSettings = new FacebookApi();
+        protected ApiSettings ApiSettings = new FacebookApi();
 
-        protected string fbAccessToken
+        protected string FbAccessToken
         {
             get
             {
@@ -37,7 +40,7 @@ namespace WebApiOAuthDemo.Controllers
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             base.OnActionExecuting(filterContext);
-            redirectUrl = ConfigHelper.GetAuthReturnUrl("AuthReturn", filterContext.ActionDescriptor.ControllerDescriptor.ControllerName);
+            RedirectUrl = ConfigHelper.GetAuthReturnUrl("AuthReturn", filterContext.ActionDescriptor.ControllerDescriptor.ControllerName);
         }
 
         public virtual ActionResult AuthReturn()
@@ -48,11 +51,11 @@ namespace WebApiOAuthDemo.Controllers
         public virtual ActionResult CancelAuth()
         {
             string deletePermissionUrl = @"https://graph.facebook.com/me/permissions?access_token={0}";
-            var request = WebRequest.Create(String.Format(deletePermissionUrl, fbAccessToken));
+            var request = WebRequest.Create(String.Format(deletePermissionUrl, FbAccessToken));
             request.Method = "DELETE";
             var response = (HttpWebResponse)request.GetResponse();
 
-            fbAccessToken = "";
+            FbAccessToken = "";
 
             return RedirectToAction("Index", "Home");
         }

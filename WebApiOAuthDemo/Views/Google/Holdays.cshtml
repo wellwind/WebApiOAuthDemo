@@ -31,13 +31,13 @@
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.StartDate)
+                @item.StartDate.ToString("yyyy/MM/dd")
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.EndDate)
+                @item.EndDate.ToString("yyyy/MM/dd")
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Link)
+                <a href="@item.Link" target="_blank">@item.Link</a>
             </td>
         </tr>
     }

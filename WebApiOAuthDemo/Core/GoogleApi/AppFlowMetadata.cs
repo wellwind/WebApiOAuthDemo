@@ -8,6 +8,9 @@ using System.Web.Mvc;
 
 namespace WebApiOAuthDemo.Core.GoogleApi
 {
+    /// <summary>
+    /// 設定Google OAuth驗證用FloeMetadata
+    /// </summary>
     public class AppFlowMetadata : FlowMetadata
     {
         private ApiSettings.ApiSettings apiSettings = new ApiSettings.GoogleApi();
@@ -54,6 +57,7 @@ namespace WebApiOAuthDemo.Core.GoogleApi
         {
             get
             {
+                // 不設定AuthCallback的話, 預設是/AuthCallback/IndexAsync
                 return "/WebApiOAuthDemo/GoogleAuthCallback/IndexAsync";
             }
         }

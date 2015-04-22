@@ -5,6 +5,9 @@ using System.Web;
 
 namespace WebApiOAuthDemo.Core.ApiSettings
 {
+    /// <summary>
+    /// 以OAuth存取Google Api的Client相關設定
+    /// </summary>
     public class GoogleApi : ApiSettings
     {
         public string ClientId { get { return "585508823640-55jeeu3tfah8qsikf46c22mgkcnm4kuc.apps.googleusercontent.com"; } set { ;} }

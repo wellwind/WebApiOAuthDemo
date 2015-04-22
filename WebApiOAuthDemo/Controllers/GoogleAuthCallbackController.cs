@@ -10,6 +10,9 @@ using WebApiOAuthDemo.Core.GoogleApi;
 
 namespace WebApiOAuthDemo.Controllers
 {
+    /// <summary>
+    /// 使用Google提供的Api元件時, 需產生一個繼承自Google.Apis.Auth.OAuth2.Mvc.Controllers.AuthCallbackController的Controller類別, 並指定FloaData
+    /// </summary>
     public class GoogleAuthCallbackController : Google.Apis.Auth.OAuth2.Mvc.Controllers.AuthCallbackController
     {
         protected override Google.Apis.Auth.OAuth2.Mvc.FlowMetadata FlowData

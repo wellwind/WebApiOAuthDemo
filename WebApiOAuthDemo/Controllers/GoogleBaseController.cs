@@ -9,13 +9,16 @@ using WebApiOAuthDemo.Core.Helpers;
 
 namespace WebApiOAuthDemo.Controllers
 {
+    /// <summary>
+    /// 使用Facebook Api的基本設定存成FacebookBaseController
+    /// </summary>
     public abstract class GoogleBaseController : Controller
     {
-        protected string redirectUrl { get; set; }
+        protected string RedirectUrl { get; set; }
 
-        protected ApiSettings apiSettings = new GoogleApi();
+        protected ApiSettings ApiSettings = new GoogleApi();
 
-        protected string googleAccessToken
+        protected string GoogleAccessToken
         {
             get
             {
@@ -37,7 +40,7 @@ namespace WebApiOAuthDemo.Controllers
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             base.OnActionExecuting(filterContext);
-            redirectUrl = ConfigHelper.GetAuthReturnUrl("AuthReturn", filterContext.ActionDescriptor.ControllerDescriptor.ControllerName);
+            RedirectUrl = ConfigHelper.GetAuthReturnUrl("AuthReturn", filterContext.ActionDescriptor.ControllerDescriptor.ControllerName);
         }
 
         public virtual ActionResult AuthReturn()
@@ -48,11 +51,11 @@ namespace WebApiOAuthDemo.Controllers
         public virtual ActionResult CancelAuth()
         {
             string deletePermissionUrl = @"https://accounts.google.com/o/oauth2/revoke?token={0}";
-            var request = WebRequest.Create(String.Format(deletePermissionUrl, googleAccessToken));
+            var request = WebRequest.Create(String.Format(deletePermissionUrl, GoogleAccessToken));
             request.Method = "GET";
             var response = (HttpWebResponse)request.GetResponse();
 
-            googleAccessToken = "";
+            GoogleAccessToken = "";
 
             return RedirectToAction("Index", "Home");
         }

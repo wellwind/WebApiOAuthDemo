@@ -14,32 +14,39 @@ using WebApiOAuthDemo.Models.ViewModels;
 
 namespace WebApiOAuthDemo.Controllers
 {
+    /// <summary>
+    /// 使用DotNetOpenAuth元件進行OAuth驗證的參考範例
+    /// </summary>
     public class FacebookOpenAuthController : FacebookBaseController
     {
+        /// <summary>
+        /// DotNetOpenAuth提供的Client物件
+        /// </summary>
         private WebServerClient oauthRequestClient;
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             base.OnActionExecuting(filterContext);
 
+            // 設定Authorization Server資訊
             AuthorizationServerDescription authorizationServer = new AuthorizationServerDescription
             {
-                AuthorizationEndpoint = new Uri(apiSettings.AuthorizationEndpoint),
-                TokenEndpoint = new Uri(apiSettings.TokenEndpoint)
+                AuthorizationEndpoint = new Uri(ApiSettings.AuthorizationEndpoint),
+                TokenEndpoint = new Uri(ApiSettings.TokenEndpoint)
             };
             oauthRequestClient = new WebServerClient(authorizationServer);
-            oauthRequestClient.ClientIdentifier = apiSettings.ClientId;
-            oauthRequestClient.ClientCredentialApplicator = ClientCredentialApplicator.PostParameter(apiSettings.Secret);
+            oauthRequestClient.ClientIdentifier = ApiSettings.ClientId;
+            oauthRequestClient.ClientCredentialApplicator = ClientCredentialApplicator.PostParameter(ApiSettings.Secret);
         }
 
         public ActionResult Index()
         {
-            if (String.IsNullOrEmpty(fbAccessToken))
+            if (String.IsNullOrEmpty(FbAccessToken))
             {
-                // 向Facebook取得code
+                // 向Facebook Authorizatoin Server取得code
                 oauthRequestClient.RequestUserAuthorization(
                     new[] { "user_photos" },
-                    new Uri(redirectUrl));
+                    new Uri(RedirectUrl));
 
                 return new EmptyResult();
             }
@@ -51,10 +58,11 @@ namespace WebApiOAuthDemo.Controllers
 
         public override ActionResult AuthReturn()
         {
+            // 回傳code後, 再向Authorization Server驗證取得Access Token
             var authorizationState = oauthRequestClient.ProcessUserAuthorization();
             if (authorizationState != null)
             {
-                fbAccessToken = authorizationState.AccessToken;
+                FbAccessToken = authorizationState.AccessToken;
             }
 
             return RedirectToAction("MyPhotos", "Facebook");

@@ -14,6 +14,11 @@ using WebApiOAuthDemo.Models.ViewModels;
 
 namespace WebApiOAuthDemo.Controllers
 {
+    /// <summary>
+    /// 使用Google Sdk存取Google Api的範例
+    /// Google Sdk進行OAuth的方法可以參考 https://developers.google.com/api-client-library/dotnet/guide/aaa_oauth
+    /// 重要：使用Google Sdk時在偵錯模式下可能會造成記憶體存取錯誤問題，目前已知是bug且無解，要測試Google Sdk請使用Ctrl+F5(啟動但不偵錯)執行
+    /// </summary>
     public class GoogleSdkController : GoogleBaseController
     {
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
@@ -23,12 +28,14 @@ namespace WebApiOAuthDemo.Controllers
 
         public async Task<ActionResult> IndexAsync(CancellationToken cancellationToken)
         {
+            // 設定好FlowMetadata及回傳的Url後Controller後，只需一行即可完成OAuth驗證授權
             var result = await new AuthorizationCodeMvcApp(this, new AppFlowMetadata()).AuthorizeAsync(cancellationToken);
 
             if (result.Credential != null)
             {
-                googleAccessToken = result.Credential.Token.AccessToken;
+                GoogleAccessToken = result.Credential.Token.AccessToken;
 
+                // 以下範例使用CalendarServer存取Google Calendar
                 var service = new CalendarService(new BaseClientService.Initializer
                 {
                     HttpClientInitializer = result.Credential,
